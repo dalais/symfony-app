@@ -25,3 +25,46 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+fos_rest:
+    param_fetcher_listener: true
+    access_denied_listener:
+        json: true
+    allowed_methods_listener:
+        enabled: true
+    routing_loader:
+        default_format:       json
+        include_format:       false
+        prefix_methods:       true
+    service:
+        router:               router
+    body_listener: true
+    format_listener:
+        enabled: true
+        rules:
+            - { path: '^/', priorities: ['json'], fallback_format: 'json', prefer_extension: false }
+    versioning: true
+    view:
+        view_response_listener: 'force'
+        formats:
+            json: true
+
+fos_oauth_server:
+    db_driver: orm
+    client_class:        App\Entity\Client
+    access_token_class:  App\Entity\AccessToken
+    refresh_token_class: App\Entity\RefreshToken
+    auth_code_class:     App\Entity\AuthCode
+    service:
+        user_provider: fos_user.user_provider.username
+        options:
+            access_token_lifetime: 86400
+            refresh_token_lifetime: 1209600
+            auth_code_lifetime: 30
+
+fos_user:
+    db_driver: orm
+    firewall_name: main
+    user_class: App\Entity\User
+    from_email:
+        address: resetting@example.com
+        sender_name: DemoResetting
